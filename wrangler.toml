@@ -8,5 +8,5 @@ binding = "KV"
 id = "cc34cc722fbc4103b4271bd7ab8732cf"
 
 [[routes]]
-pattern = "sub2.9vi.us"
-custom_domain = true
+pattern = "sub2.9vi.us/*"
+zone_name = "9vi.us"
