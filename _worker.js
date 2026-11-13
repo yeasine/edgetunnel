@@ -17,6 +17,18 @@ const 汇聚订阅_UA = 'v2rayN/edge' + 'tunnel (https://github.com/' + 特征�
 ///////////////////////////////////////////////////////主程序入口///////////////////////////////////////////////
 export default {
 	async fetch(request, env, ctx) {
+		try {
+			return await 处理入口请求(request, env, ctx);
+		} catch (error) {
+			return new Response(`Runtime error: ${error?.stack || error}`, {
+				status: 500,
+				headers: { 'Content-Type': 'text/plain; charset=UTF-8' }
+			});
+		}
+	}
+};
+
+async function 处理入口请求(request, env, ctx) {
 		let 请求URL文本 = request.url.replace(/%5[Cc]/g, '').replace(/\\/g, '');
 		const 请求URL锚点索引 = 请求URL文本.indexOf('#');
 		const 请求URL主体部分 = 请求URL锚点索引 === -1 ? 请求URL文本 : 请求URL文本.slice(0, 请求URL锚点索引);
@@ -41,7 +53,7 @@ export default {
 		反代并发拨号数 = Math.max(1, Number(env.PROXY_CONCURRENT_DIAL) || 反代并发拨号数);
 		TCP并发拨号数 = Math.max(1, Number(env.TCP_CONCURRENT_DIAL) || TCP并发拨号数);
 		if (!env.TCP_CONCURRENT_DIAL && TCP并发拨号数 !== 1 && 识别运营商(request) === 'cmcc') TCP并发拨号数 = 1;
-		let 默认反代IP = (`${request.cf.colo}.${特征码字典[0]}.${特征码字典[1]}SsSs.nEt`).toLowerCase(), 默认反代兜底 = true;
+		let 默认反代IP = (`${request.cf?.colo}.${特征码字典[0]}.${特征码字典[1]}SsSs.nEt`).toLowerCase(), 默认反代兜底 = true;
 		if (env.PROXYIP) {
 			const proxyIPs = await 整理成数组(env.PROXYIP);
 			默认反代IP = proxyIPs[Math.floor(Math.random() * proxyIPs.length)];
@@ -527,7 +539,6 @@ export default {
 		} catch (error) { }
 		return new Response(await nginx(), { status: 200, headers: { 'Content-Type': 'text/html; charset=UTF-8' } });
 	}
-};
 ///////////////////////////////////////////////////////////////////////叉HTTP传输数据///////////////////////////////////////////////
 const HPACKHuffman码长 = [
 	13, 23, 28, 28, 28, 28, 28, 28, 28, 24, 30, 28, 28, 30, 28, 28,
